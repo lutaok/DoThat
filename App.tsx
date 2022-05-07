@@ -1,20 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
+import ToDoItem from './components/ToDoItem';
+import HeaderBand from './components/HeaderBand';
+import globalStyles from './global-styles';
+import exampleJson from './assets/todos.json';
 
 export default function App() {
+  const data = exampleJson.todos;
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={globalStyles.homepage}>
+      <HeaderBand></HeaderBand>
+      <ScrollView contentContainerStyle={globalStyles.scrollView}>
+        {data.map((todo, index) => {
+          return <ToDoItem key={`todo_${index}`} todoItem={todo}></ToDoItem>;
+        })}
+      </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
