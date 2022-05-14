@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, TouchableOpacity, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -49,29 +49,53 @@ const CreateTodo = ({ navigation, route }: { navigation: any; route: any }) => {
         <TextInput style={createTodoStyles.titleInput} onChangeText={onTitleChange}></TextInput>
       </View>
       <Text style={createTodoStyles.label}>State</Text>
-      <View style={createTodoStyles.pickerContainer}>
-        <Picker style={createTodoStyles.select} selectedValue={selectedState} onValueChange={(itemValue) => setSelectedState(itemValue)}>
+      {Platform.OS === 'android' && (
+        <View style={createTodoStyles.pickerContainer}>
+          <Picker style={createTodoStyles.select} selectedValue={selectedState} onValueChange={(itemValue) => setSelectedState(itemValue)}>
+            <Picker.Item label="Dead" value="Dead" />
+            <Picker.Item label="Running" value="Running" />
+            <Picker.Item label="Alive" value="Alive" />
+          </Picker>
+        </View>
+      )}
+      {Platform.OS === 'ios' && (
+        <Picker itemStyle={{ height: 40 }} style={createTodoStyles.selectIOS} selectedValue={selectedState} onValueChange={(itemValue) => setSelectedState(itemValue)}>
           <Picker.Item label="Dead" value="Dead" />
           <Picker.Item label="Running" value="Running" />
           <Picker.Item label="Alive" value="Alive" />
         </Picker>
-      </View>
+      )}
       <Text style={createTodoStyles.label}>End Date</Text>
       <TouchableWithoutFeedback onPress={openDatePicker}>
         <View style={createTodoStyles.button}>
           <Text style={createTodoStyles.buttonText}>Choose the end date</Text>
         </View>
       </TouchableWithoutFeedback>
-      {showDatePicker && (
-        <DateTimePicker
-          value={selectedDate}
-          minimumDate={new Date()}
-          onChange={(event: any, date: Date | undefined) => {
-            onDateChange(event, date);
-          }}
-        />
+      {showDatePicker && Platform.OS === 'android' && (
+        <>
+          <DateTimePicker
+            value={selectedDate}
+            minimumDate={new Date()}
+            onChange={(event: any, date: Date | undefined) => {
+              onDateChange(event, date);
+            }}
+          />
+          <Text style={createTodoStyles.label}>{selectedDate.toLocaleDateString()}</Text>
+        </>
       )}
-      <Text style={createTodoStyles.label}>{selectedDate.toLocaleDateString()}</Text>
+      {showDatePicker && Platform.OS === 'ios' && (
+        <View style={createTodoStyles.datePickerContainerIOS}>
+          <DateTimePicker
+            style={createTodoStyles.datePickerIOS}
+            value={selectedDate}
+            minimumDate={new Date()}
+            display="calendar"
+            onChange={(event: any, date: Date | undefined) => {
+              onDateChange(event, date);
+            }}
+          />
+        </View>
+      )}
 
       <TouchableOpacity style={[createTodoStyles.button, createTodoStyles.submitButton]} onPress={sendTodo}>
         <Text style={createTodoStyles.buttonText}>Submit Todo</Text>
@@ -117,6 +141,25 @@ const createTodoStyles = StyleSheet.create({
     backgroundColor: '#FFF',
     width: '100%',
     marginTop: -6,
+  },
+  selectIOS: {
+    width: '80%',
+    backgroundColor: '#FFF',
+    height: 40,
+    paddingBottom: 30,
+    borderRadius: 8,
+    marginBottom: 5,
+  },
+  datePickerContainerIOS: {
+    width: '80%',
+    height: 40,
+    marginTop: 5,
+  },
+  datePickerIOS: {
+    borderRadius: 8,
+    flex: 1,
+    alignSelf: 'center',
+    width: '40%',
   },
   button: {
     width: '80%',
